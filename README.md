@@ -1,5 +1,7 @@
 # Movie Theater Booking Service (C++)
 
+[![CI](https://github.com/<your-username>/<repo-name>/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-username>/<repo-name>/actions/workflows/ci.yml)
+
 A thread-safe, in-memory backend service for booking movie theater seats.
 
 ## Features
