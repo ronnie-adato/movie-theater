@@ -1,0 +1,4 @@
+CompileFlags:
+  CompilationDatabase: build/conan/build/Release
+  Add:
+    - -Iinclude

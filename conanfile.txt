@@ -1,0 +1,14 @@
+[requires]
+ng-log/0.8.2
+
+[tool_requires]
+
+[generators]
+CMakeToolchain
+CMakeDeps
+
+[layout]
+cmake_layout
+
+[options]
+*:shared=False

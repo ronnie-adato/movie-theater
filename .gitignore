@@ -1,0 +1,43 @@
+# Build outputs
+build/
+dist/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+CMakeUserPresets.json
+CPackConfig.cmake
+CPackSourceConfig.cmake
+*.ninja
+.ninja_deps
+.ninja_log
+
+# Conan generated files/folders
+conan.lock
+conanbuild*
+conanrun*
+generators/
+
+# VS Code / tooling
+.vscode/
+.cache/
+
+# Python virtual environments and caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# OS artifacts
+.DS_Store
+
+# Local documents/assets
+CPP_Test.pdf
