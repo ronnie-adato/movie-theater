@@ -1,0 +1,27 @@
+# Build and package artifacts
+build/
+dist/
+
+# Conan cache/output
+.conan/
+.conan2/
+
+# VCS and editor
+.git/
+.gitignore
+.vscode/
+
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# OS / temp
+.DS_Store
+*.swp
+*.tmp
+*.log
+
+# Large local docs/assets not required for container build
+CPP_Test.pdf
