@@ -174,6 +174,8 @@ if(BUILD_TESTS)
         GTest::gtest_main
     )
 
+    include(GoogleTest)
+    
     gtest_discover_tests(movie_booking_tests
         DISCOVERY_MODE PRE_TEST
         DISCOVERY_TIMEOUT 30
