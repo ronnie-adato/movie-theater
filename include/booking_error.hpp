@@ -3,13 +3,11 @@
 #include <stdexcept>
 #include <vector>
 
-
 /**
  * @namespace movie_booking
  * @brief All movie theater booking related classes and exceptions.
  */
 namespace movie_booking {
-
 
 /**
  * @class InvalidSeat
@@ -30,7 +28,6 @@ class InvalidSeat : public std::invalid_argument {
      */
     const std::string seatId;
 };
-
 
 /**
  * @class SeatAlreadyBooked

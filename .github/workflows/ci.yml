@@ -25,17 +25,52 @@ jobs:
         run: python -m pip install conan
       - name: Conan profile detect
         run: conan profile detect --force
+      - name: Export ng-log recipe
+        run: conan export conan/recipes/ng-log --version=0.8.2
       - name: Install CMake
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: '3.22.0'
       - name: Install Ninja
         uses: seanmiddleditch/gha-setup-ninja@v4
+      - name: Install lcov
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get install -y lcov
       - name: Conan install
-        run: conan install conanfile.txt --output-folder=build/conan --build=missing -s build_type=Release
+        run: conan install conanfile.txt --output-folder=build/conan --build=missing -s build_type=${{ matrix.os == 'ubuntu-latest' && 'Debug' || 'Release' }}
       - name: Configure CMake
-        run: cmake --preset conan-release -DBUILD_TESTS=ON
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            cmake --preset conan-debug -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage"
+          else
+            cmake --preset conan-release -DBUILD_TESTS=ON
+          fi
       - name: Build
-        run: cmake --build --preset conan-release
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            cmake --build --preset conan-debug
+          else
+            cmake --build --preset conan-release
+          fi
       - name: Run tests
-        run: ctest --test-dir build/conan/build/Release --output-on-failure
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            ctest --test-dir build/conan/build/Debug --output-on-failure
+          else
+            ctest --test-dir build/conan/build/Release --output-on-failure
+          fi
+      - name: Generate coverage report
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          lcov --capture --directory build/conan/build/Debug --output-file coverage.info
+          lcov --remove coverage.info '/usr/*' '*/_deps/*' --output-file coverage.info
+          lcov --list coverage.info
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+      - name: Export ng-log recipe
+        run: conan export conan/recipes/ng-log --version=0.8.2
