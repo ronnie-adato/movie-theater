@@ -1,5 +1,7 @@
+
 [requires]
 ng-log/0.8.2
+gtest/1.14.0
 
 [tool_requires]
 
