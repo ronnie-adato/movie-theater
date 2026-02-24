@@ -8,6 +8,8 @@ class MovieTheaterConan(ConanFile):
     package_type = "application"
 
     settings = "os", "compiler", "build_type", "arch"
+    options = {"build_tests": [True, False]}
+    default_options = {"build_tests": True}
 
     exports_sources = "CMakeLists.txt", "include/*", "src/*", "tests/*"
 
@@ -15,6 +17,8 @@ class MovieTheaterConan(ConanFile):
 
     def requirements(self):
         self.requires("ng-log/0.8.2")
+        if self.options.build_tests:
+            self.requires("gtest/1.14.0")
 
     def package_info(self):
         self.cpp_info.bindirs = ["bin"]
@@ -24,7 +28,7 @@ class MovieTheaterConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        cmake.configure(variables={"BUILD_TESTS": True})
+        cmake.configure(variables={"BUILD_TESTS": self.options.build_tests})
         cmake.build()
 
     def package(self):

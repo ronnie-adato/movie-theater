@@ -3,6 +3,7 @@
 #include "booking_error.hpp"
 
 #include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <unordered_set>
 

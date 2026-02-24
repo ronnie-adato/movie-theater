@@ -12,6 +12,7 @@ RUN apt-get update \
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:${PATH}"
+ENV CONAN_LOG_LEVEL=warning
 
 RUN pip install --no-cache-dir --upgrade pip conan
 
@@ -19,10 +20,10 @@ WORKDIR /app
 COPY . .
 
 RUN conan profile detect --force \
-    && conan export conan/recipes/ng-log --version=0.8.2 \
-    && conan install conanfile.txt --output-folder=build/conan --build=missing -s build_type=Release \
+    && conan create conan/recipes/ng-log --version=0.8.2 --build=missing -s build_type=Release -v${CONAN_LOG_LEVEL} \
+    && conan install conanfile.py --output-folder=build/conan --build=missing -s build_type=Release -v${CONAN_LOG_LEVEL} \
     && cmake --preset conan-release -DBUILD_TESTS=ON -DENABLE_PACKAGE_CONSUMER_TEST=ON \
     && cmake --build --preset conan-release -j \
-    && ctest --test-dir build/conan/build/Release --output-on-failure
+    && ctest --preset conan-release --output-on-failure
 
-CMD ["./build/conan/build/Release/movie_booking_cli"]
+CMD ["./build/conan/build/movie_booking_cli"]

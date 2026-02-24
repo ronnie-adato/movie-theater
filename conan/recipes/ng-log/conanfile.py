@@ -1,6 +1,7 @@
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps, cmake_layout
 from conan.tools.files import get
+import os
 
 
 class NgLogConan(ConanFile):
@@ -13,6 +14,33 @@ class NgLogConan(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     exports_sources = "*"
+
+    def _append_install_rules_if_missing(self):
+        cmakelists = os.path.join(self.source_folder, "CMakeLists.txt")
+        if not os.path.exists(cmakelists):
+            return
+
+        with open(cmakelists, "r+", encoding="utf-8") as file:
+            content = file.read()
+            patch = ""
+
+            if "install(TARGETS" not in content:
+                patch += (
+                    "\ninstall(TARGETS ng-log EXPORT ng-logTargets "
+                    "ARCHIVE DESTINATION lib LIBRARY DESTINATION lib "
+                    "RUNTIME DESTINATION bin INCLUDES DESTINATION include)\n"
+                )
+
+            include_dir = os.path.join(self.source_folder, "include")
+            if os.path.isdir(include_dir) and "install(DIRECTORY include/ DESTINATION include)" not in content:
+                patch += (
+                    "install(DIRECTORY include/ DESTINATION include FILES_MATCHING "
+                    "PATTERN \"*.h\" PATTERN \"*.hpp\")\n"
+                )
+
+            if patch:
+                file.seek(0, os.SEEK_END)
+                file.write(patch)
 
     def layout(self):
         cmake_layout(self)
@@ -35,6 +63,7 @@ class NgLogConan(ConanFile):
         deps.generate()
 
     def build(self):
+        self._append_install_rules_if_missing()
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
@@ -46,7 +75,11 @@ class NgLogConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "ng-log")
         self.cpp_info.set_property("cmake_target_name", "ng-log::ng-log")
-        self.cpp_info.libs = ["ng-log"]
+        # Use ng-logd for Debug, ng-log for other build types
+        if self.settings.build_type == "Debug":
+            self.cpp_info.libs = ["ng-logd"]
+        else:
+            self.cpp_info.libs = ["ng-log"]
         self.cpp_info.defines.append("NGLOG_USE_EXPORT")
         if not self.options.shared:
             self.cpp_info.defines.append("NGLOG_STATIC_DEFINE")
